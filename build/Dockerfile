@@ -18,29 +18,16 @@ echo "deb-src http://http.kali.org/kali kali-rolling main contrib non-free" >> /
 ENV DEBIAN_FRONTEND noninteractive
 RUN apt-get update -y && apt-get dist-upgrade -y
 
-RUN apt-get install -y \
-net-tools \
-kali-desktop-xfce \
-git \
-x11vnc \
-xvfb \
+RUN apt-get install -y  novnc x11vnc net-tools kali-desktop-xfce git \
 wget \
 python3 \
 python3-numpy \
-unzip \
-menu && \
-cd /root && git clone https://github.com/kanaka/noVNC.git && \
-cd noVNC/utils && git clone https://github.com/kanaka/websockify websockify && \
-cd /root
+unzip curl
 
 RUN cat <<EOF > /root/startup.sh 
 #!/bin/bash
-export DISPLAY=:1
-Xvfb :1 -screen 0 1600x900x16 &
-sleep 5
-xfce4-session&
-x11vnc -display :1 -nopw -listen localhost -xkb -forever &
-cd /root/noVNC && ln -s vnc_auto.html index.html && ./utils/launch.sh --vnc localhost:5900
+x11vnc -display :0 -autoport -localhost -nopw -bg -xkb -ncache -ncache_cr -quiet -forever
+
 EOF
 
 RUN chmod 0755 /root/startup.sh  && \
